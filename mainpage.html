@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What To Do?</title>
+    <link rel="stylesheet" href="./src/output.css">
+</head>
+<body class="bg-[#000000] text-[#FAFAFA] px-16 md:px-40 mx-16 md:mx-40 lg:mx-96 flex flex-col justify-center min-h-screen">
+    <section id="header" class="bg-[#171717] flex flex-col justify-center items-center py-4 mb-8 space-y-2">
+        <h1 class="font-bold text-2xl md:text-4xl lg:text-6xl">What To Do?</h1>
+        <h4 class="font-bold text-lg md:text-xl lg:text-2xl">Your daily tasks organizer</h4>
+    </section>
+
+    <section id="form" class="bg-[#171717] flex flex-col justify-center items-center py-4 mb-8 space-y-2">
+        <h4 class="font-bold text-2xl md:text-4xl lg:text-6xl">Feeling productive today?</h4>
+        <h4 class="font-bold text-lg md:text-xl lg:text-2xl">Let's add your task down below</h4>
+
+        <div class="flex items-center justify-center p-1">
+            <form id="input-task-form" action="" class="rounded-xl">
+                <input id="input-task" type="text" placeholder="Add New Task" class="text-[#000000] py-1 mr-2 text-center text-lg md:text-xl lg:text-2xl">
+                <button id="submit" class="font-bold text-xl py-1 px-4 rounded-md bg-red-700 hover:bg-red-600">Add</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="list" class="bg-[#171717] flex flex-col justify-center items-center py-4 mb-8">
+        <h4 class="font-bold text-2xl md:text-4xl lg:text-6xl mb-8">Your To-Do List</h4>
+        <ul id="task-list">
+            <!-- The tasks input will be display here -->
+        </ul>
+        <button id="clear-tasks" class="font-bold text-xl py-2 px-4 mt-8 rounded-lg bg-red-700 hover:bg-red-600">Clear Tasks</button>
+    </section>
+
+
+
+
+
+
+
+
+    <script>
+        // DOMContentLoaded is to ensure the JS is run AFTER the HTML is fully loaded.
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskInput = document.getElementById('input-task');
+            const taskForm = document.getElementById('input-task-form');
+            const taskList = document.getElementById('task-list');
+            const clearButton = document.getElementById('clear-tasks');
+
+            loadTasks();
+
+            taskForm.addEventListener('submit', function(event){
+                event.preventDefault();
+
+                const task = taskInput.value;
+                if(task) {
+                    addTask(task);
+                    saveTask(task);
+                    taskInput.value = "";
+                }
+            });
+
+            clearButton.addEventListener('click', function() {
+                const confirmation = confirm("Are you sure you want to delete all tasks?");
+                if (confirmation) {
+                    localStorage.removeItem('tasks'); // clear localStorage
+                    taskList.innerHTML = ""; // clear the task list from the page
+                    alert("All tasks have been deleted.");
+                }
+            });
+
+            function addTask(task, isCompleted) {
+                const li = document.createElement('li');
+                li.classList.add('flex', 'items-center', 'mb-2');
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('w-6', 'h-6', 'accent-green-500');
+                checkbox.checked = isCompleted; 
+
+                const label = document.createElement('label');
+                label.classList.add('text-xl', 'font-medium', 'ml-2')
+                label.textContent = task;
+
+                // Event for when the tasks is checked/unchecked then update the localStorage
+                checkbox.addEventListener('change', function() {
+                    updateTaskStatus(task, checkbox.checked);
+                });
+
+                li.appendChild(checkbox);
+                li.appendChild(label);
+                taskList.appendChild(li);
+            }
+
+            function saveTask(task, isCompleted) {
+                let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                tasks.push({task, isCompleted});
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+
+            function updateTask(task,isCompleted) {
+                let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                tasks = tasks.map(t => {
+                    if(t.task === task) {
+                        return {task, isCompleted};
+                    }else{
+                        return t;
+                    }
+                });
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+
+            function loadTasks() {
+                let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                tasks.forEach(t => addTask(t.task, t.isCompleted));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -11,6 +11,9 @@ module.exports = {
         '2xl': '1536px', // Ultra-large screens
       }
     },
+    fontFamily: {
+      'kanit' : ['Kanit']
+    }
   },
   plugins: [],
 }
